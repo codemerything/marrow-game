@@ -1,0 +1,2070 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background-color: #18141a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    height: 100vh;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+.selection-screen, .game-container {
+    background-color: #23232b;
+    padding: 20px;
+    border-radius: 0;
+    box-shadow: 0 0 0 2px #18141a, 0 0 0 8px #000;
+    color: #e0e0e0;
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+    border: 2px solid #18141a;
+}
+
+.selection-screen {
+    background: #23232b;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px #000a, 0 0 0 2px #18141a;
+    color: #e0e0e0;
+    text-align: center;
+    max-width: none;
+    width: auto;
+    margin: 0 auto;
+    padding: 16px 16px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.selection-grid {
+    display: inline-flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-start;
+    width: auto;
+    margin-bottom: 18px;
+}
+
+.selection-column {
+    background: rgba(35, 35, 43, 0.6);
+    border-radius: 15px;
+    padding: 16px 6px 16px 6px;
+    min-width: 208px;
+    max-width: 256px;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 12px #000a;
+    border: 2px solid rgba(224,224,224,0.08);
+}
+
+.selection-column h2, .section-title, .main-title, .game-header h1, .harvest-content h2, .harvest-results h2, .results-content h2, .status-display h3, .notification-section h3 {
+    color: #e0e0e0 !important;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 1.5em;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px #000a;
+}
+
+.seed-options, .soil-options {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    justify-items: stretch;
+    align-items: stretch;
+}
+
+.seed-option, .soil-option {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    background: none;
+    border-radius: 10px;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    display: block !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.seed-option.selected, .soil-option.selected {
+    box-shadow: 0 0 16px 4px #fff, 0 0 0 2px #fff;
+    border-color: #fff;
+    background: #23232b;
+}
+
+.seed-option:hover, .soil-option:hover {
+    box-shadow: 0 0 16px 4px #bfcfff, 0 0 0 2px #bfcfff;
+    border-color: #bfcfff;
+    background: #23232b;
+}
+
+.seed-img, .soil-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border: none;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: none;
+    position: static;
+}
+
+.seed-name, .soil-name {
+    background: rgba(24, 20, 26, 0.35);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    padding: 1px 0 1px 0;
+    border-radius: 0 0 8px 8px;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    letter-spacing: 0.5px;
+}
+
+.green-seed {
+    background-color: #2ecc71;
+    box-shadow: 0 0 10px #2ecc71;
+}
+
+.purple-seed {
+    background-color: #9b59b6;
+    box-shadow: 0 0 10px #9b59b6;
+}
+
+.orange-seed {
+    background-color: #e67e22;
+    box-shadow: 0 0 10px #e67e22;
+}
+
+.basic-soil {
+    background-color: #8B4513;
+    box-shadow: 0 0 10px #8B4513;
+}
+
+.premium-soil {
+    background-color: #654321;
+    box-shadow: 0 0 10px #654321;
+}
+
+.organic-soil {
+    background-color: #556B2F;
+    box-shadow: 0 0 10px #556B2F;
+}
+
+.seed-desc, .soil-desc {
+    color: #bdbdbd;
+    font-size: 0.95em;
+    margin-bottom: 0;
+    text-shadow: none;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+.hidden {
+    display: none;
+}
+
+.game-container {
+    background-color: #34495e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.game-header {
+    margin-bottom: 20px;
+}
+
+.stage-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.progress-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.progress-section {
+    background-color: #23232b;
+    padding: 10px;
+    border-radius: 5px;
+    color: #e0e0e0;
+}
+
+.progress-label {
+    font-size: 1em;
+    color: #e0e0e0;
+    margin-bottom: 2px;
+    text-shadow: none;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 22px;
+    background: #18141a;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+    margin-top: 4px;
+    border: 2px solid #23232b;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #e0e0e0;
+    border-radius: 0;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    box-shadow: none;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+button, .start-button {
+    background-color: #23232b;
+    border: 2px solid #e0e0e0;
+    color: #e0e0e0;
+    padding: 10px 22px;
+    border-radius: 0;
+    cursor: pointer;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 1.1em;
+    margin: 0 4px;
+    box-shadow: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    text-shadow: none;
+}
+
+button:hover, .start-button:hover {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+}
+
+button:disabled, .start-button:disabled {
+    background: #23232b;
+    color: #bdbdbd;
+    cursor: not-allowed;
+    border-color: #18141a;
+}
+
+.stats {
+    margin-top: 20px;
+    font-size: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background: #18141a;
+    padding: 10px;
+    border-radius: 0;
+    box-shadow: none;
+    border: 1px solid #23232b;
+}
+
+.status-display {
+    margin-top: 15px;
+    padding: 10px;
+    background: #18141a;
+    color: #e0e0e0;
+    border-radius: 0;
+    box-shadow: none;
+    border: 1px solid #23232b;
+    font-size: 14px;
+}
+
+.status-display h3 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    color: #bfcfff;
+    text-shadow: none;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+.status-display.hidden {
+    display: none;
+}
+
+#plantStatus {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.resource-bars {
+    margin: 24px 0 16px 0;
+    background: #23232b;
+}
+
+.resource {
+    margin-bottom: 16px;
+}
+
+.bar {
+    width: 100%;
+    height: 22px;
+    background: #18141a;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 8px #a8002c55, 0 1px 2px #000a;
+    margin-top: 4px;
+    border: 2px solid #2a0a12;
+}
+
+.level {
+    height: 100%;
+    background: #e0e0e0;
+    border-radius: 8px 0 0 8px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    box-shadow: none;
+}
+
+/* Optional: Different colors for each bar */
+.resource:nth-child(1) .level { background: #bfcfff; }
+.resource:nth-child(2) .level { background: #fff; }
+.resource:nth-child(3) .level { background: #bdbdbd; }
+.resource:nth-child(4) .level {
+    background-color: var(--stress-color, #23232b);
+    transition: background-color 0.4s cubic-bezier(.4,0,.2,1);
+}
+
+label, .progress-label, .seed-name, .soil-name {
+    color: #e0e0e0;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+}
+
+@media (max-width: 900px) {
+    .selection-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+    .selection-column {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Mobile layout: header + mobile message */
+    body {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        min-height: 100vh;
+        height: auto; /* Allow body to take necessary height */
+    }
+
+    header {
+        display: block; /* Ensure header is displayed */
+        width: 100%;
+        margin-top: 0; /* Remove top margin */
+        padding: 20px; /* Add some padding */
+        box-sizing: border-box;
+    }
+
+    .main-container {
+        display: none; /* Hide the main game content container */
+    }
+
+    #nameInputScreen,
+    #selectionScreen,
+    #gameSection {
+        display: none !important;
+    }
+
+    #mobileMessage {
+        display: flex; /* Display the mobile message */
+        position: static; /* Remove fixed positioning */
+        width: 100%;
+        flex-grow: 1; /* Take up remaining vertical space */
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #18141a; /* Ensure background covers the area */
+        color: #ffd700; /* Keep the yellow color */
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+        font-size: 1.5em;
+        z-index: 4000; /* Keep high z-index */
+    }
+}
+
+@media (min-width: 901px) {
+    #mobileMessage {
+        display: none !important;
+    }
+    /* Restore desktop layout */
+    body {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        min-height: 100vh;
+        height: 100vh;
+    }
+    header {
+        display: flex; /* Restore desktop header display */
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 32px;
+        padding: 0;
+    }
+    .main-container {
+        display: flex; /* Restore main container display */
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100vw;
+        max-width: 1200px; /* Restore max-width */
+        min-height: 100vh; /* Restore min-height */
+        height: 100vh; /* Restore height */
+        margin: 0 auto; /* Center on desktop */
+    }
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100vw;
+    min-height: 100vh;
+    height: auto;
+}
+
+.main-title {
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 2.2em;
+    color: #fff;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 32px;
+    letter-spacing: 2px;
+    font-weight: normal;
+    position: static;
+    left: auto;
+    right: auto;
+    z-index: 10;
+    text-shadow:
+        -2px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000,
+         0  0 8px #fff,
+         0  0 16px #fff;
+    padding-top: 12px;
+}
+
+header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 32px;
+}
+
+.section-title {
+    width: 210px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: 0.96em;
+    margin-bottom: 14px;
+}
+
+/* Harvest Window Styles */
+.harvest-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 2px solid #4a4a4a;
+    color: #fff;
+    text-align: center;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.harvest-content h2 {
+    color: #ff6b6b;
+    margin-bottom: 1.5rem;
+}
+
+.harvest-timer {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #ffd700;
+}
+
+.harvest-stats {
+    margin-bottom: 1.5rem;
+}
+
+.harvest-stats div {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.harvest-button {
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.harvest-button:hover {
+    background: #ff5252;
+}
+
+/* Harvest Results Styles */
+.harvest-results {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 2px solid #4a4a4a;
+    color: #fff;
+    text-align: center;
+    z-index: 1000;
+    min-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.results-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.harvest-stats,
+.harvest-stats-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 1.5rem 0;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.stat-item {
+    margin: 0.8rem 0;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.stat-label {
+    color: #ffd700;
+    margin-right: 0.5rem;
+}
+
+.final-plant-image {
+    max-width: 200px;
+    margin: 1.5rem 0 1.5rem 0;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.3);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.new-game-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: block;
+    margin: 0 auto;
+}
+
+.new-game-button:hover {
+    background: #45a049;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.game-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    max-width: 1200px;
+    min-height: 0;
+    margin: 0 auto;
+}
+
+.plant-hud {
+    background: #23232b;
+    border-right: 3px solid #18141a;
+    border-radius: 10px 0 0 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    min-width: 220px;
+    padding: 24px 16px 24px 16px;
+    box-sizing: border-box;
+    height: 100%;
+    color: #e0e0e0;
+}
+
+.plant-image-section {
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.plant-image-section img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 1px 9px #000a, 0 0 0 3px #23232b;
+    background: #223;
+    border: 1.5px solid #bfcfff;
+    display: block;
+}
+
+.plant-info {
+    width: 100%;
+    text-align: center;
+    margin-top: 24px;
+}
+
+.plant-stage-label, .plant-health-label {
+    font-size: 1.5em;
+    color: #bfcfff;
+    margin: 28px 0 0 0;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    letter-spacing: 2px;
+}
+
+.main-game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-radius: 0 10px 10px 0;
+    height: auto;
+    background: #23232b;
+    color: #e0e0e0;
+}
+
+@media (max-width: 900px) {
+    .game-layout {
+        flex-direction: column;
+        height: auto;
+    }
+    .plant-hud {
+        flex-direction: row;
+        width: 100%;
+        min-width: 0;
+        border-right: none;
+        border-bottom: 3px solid #18141a;
+        padding: 16px 0 16px 0;
+        justify-content: center;
+        height: auto;
+    }
+    .main-game-area {
+        min-height: 0;
+        height: auto;
+    }
+}
+
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.game-controls > div {
+    display: flex;
+    gap: 18px;
+}
+
+.light-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.light-control label {
+    color: #bfcfff;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 1em;
+    margin-bottom: 6px;
+}
+
+.light-control input[type="range"] {
+    width: 320px;
+    accent-color: #e0e0e0;
+    background: #18141a;
+    border-radius: 4px;
+    height: 6px;
+}
+
+.light-control input[type="range"]::-webkit-slider-thumb {
+    background: #e0e0e0;
+    border: 2px solid #23232b;
+}
+
+.light-control input[type="range"]::-moz-range-thumb {
+    background: #e0e0e0;
+    border: 2px solid #23232b;
+}
+
+.light-control input[type="range"]::-ms-thumb {
+    background: #e0e0e0;
+    border: 2px solid #23232b;
+}
+
+.feeding-schedule-config {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #18141a;
+    border: 2px solid #bfcfff;
+    padding: 24px;
+    border-radius: 8px;
+    z-index: 1000;
+    color: #e0e0e0;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    max-width: 90%;
+    width: 500px;
+}
+
+.feeding-schedule-config h2 {
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.2em;
+}
+
+.schedule-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #23232b;
+    border-radius: 4px;
+}
+
+.schedule-section h3 {
+    color: #bfcfff;
+    margin-bottom: 16px;
+    font-size: 1em;
+}
+
+.schedule-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.schedule-controls label {
+    color: #e0e0e0;
+    font-size: 0.8em;
+}
+
+.schedule-controls input[type="number"],
+.schedule-controls select {
+    background: #18141a;
+    border: 1px solid #bfcfff;
+    color: #e0e0e0;
+    padding: 8px;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 0.8em;
+}
+
+.schedule-controls input[type="number"] {
+    width: 80px;
+}
+
+.schedule-controls select {
+    width: 100%;
+}
+
+#saveScheduleBtn,
+#randomFeedsBtn,
+.feeding-buttons-row button {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.schedule-info {
+    background: #23232b;
+    padding: 16px;
+    border-radius: 4px;
+    margin-top: 16px;
+}
+
+.schedule-info h3 {
+    color: #bfcfff;
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.schedule-info p {
+    color: #e0e0e0;
+    font-size: 0.8em;
+    margin: 8px 0;
+}
+
+.notification-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #4a4a4a;
+    border-radius: 5px;
+    color: #bfcfff;
+    font-family: "Press Start 2P", Courier, monospace;
+    min-height: 140px;
+    max-height: 220px;
+    font-size: 1em;
+    max-width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.notification-section h3 {
+    color: #ffd700;
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    text-align: center;
+}
+
+.event-log {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.75em;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+.event-log::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.event-item {
+    padding: 8px;
+    border-radius: 0 !important;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.event-item.info {
+    background: rgba(0, 100, 255, 0.2);
+    border-left: 3px solid #0064ff;
+}
+
+.event-item.warning {
+    background: rgba(255, 165, 0, 0.2);
+    border-left: 3px solid #ffa500;
+}
+
+.event-item.error {
+    background: rgba(255, 0, 0, 0.2);
+    border-left: 3px solid #ff0000;
+}
+
+.event-item.actofgod {
+    background: linear-gradient(90deg, #ff00cc 0%, #ffea00 100%);
+    color: #18141a;
+    border-left: 5px solid #ff1744;
+    font-weight: bold;
+    text-shadow: 0 1px 2px #fff, 0 0 8px #ffea00;
+    box-shadow: 0 0 16px 4px #ffea00, 0 0 8px #ff00cc;
+    font-size: 1em;
+}
+
+/* Remove old popup styles */
+.pest-popup, .raider-popup, .nutrient-popup {
+    display: none;
+}
+
+.feeding-schedule-config-fullpage {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #18141a;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 48px;
+}
+
+.stage-schedule-block {
+    background: #23232b;
+    border-radius: 10px;
+    padding: 32px 48px;
+    margin-bottom: 32px;
+    box-shadow: 0 0 0 2px #18141a, 0 0 0 8px #000;
+    border: 2px solid #18141a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 420px;
+}
+
+.stage-label {
+    color: #e0e0e0;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.3em;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.water-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 18px;
+}
+
+.water-circle {
+    width: 90px;
+    height: 90px;
+    border-radius: 8px;
+    background: #18141a;
+    color: #e0e0e0;
+    font-size: 2.8em;
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid #e0e0e0;
+    box-shadow: none;
+}
+
+.big-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 2.5em;
+    font-family: 'Arial Black', 'Arial', sans-serif;
+    font-weight: bold;
+    background: #23232b;
+    color: #e0e0e0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+.big-btn:hover, .big-btn:active {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+}
+
+.nutrient-row {
+    display: flex;
+    gap: 18px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nutrient-btn {
+    font-size: 1.1em;
+    font-family: 'Press Start 2P', monospace;
+    background: #23232b;
+    color: #e0e0e0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 18px 28px;
+    margin: 0 4px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    box-shadow: none;
+}
+
+.nutrient-btn.selected, .nutrient-btn:hover, .nutrient-btn:active {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+}
+
+.save-btn {
+    margin-top: 32px;
+    font-size: 1.5em;
+    font-family: 'Press Start 2P', monospace;
+    background: #23232b;
+    color: #e0e0e0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 18px 48px;
+    cursor: pointer;
+    box-shadow: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.save-btn:hover, .save-btn:active {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+}
+
+#gameContainer {
+    background: #23232b;
+    color: #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 0 20px #18141a;
+    padding: 20px;
+}
+
+.plant-hud,
+.main-game-area,
+#gameContainer,
+.notification-section,
+.harvest-window,
+.harvest-results,
+.final-plant-image,
+.stage-schedule-block {
+    border-radius: 10px !important;
+}
+
+.bar, .progress-bar, .level, .progress-fill, .resource-bars, .status-display, .stats, .schedule-info, .save-btn, .nutrient-btn, .big-btn, .water-circle {
+    border-radius: 0 !important;
+}
+
+input, button, .local-hud, .event-log, .event-item {
+    border-radius: 0 !important;
+}
+
+.nutrient-wheel {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin: 24px auto 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nutrient-btn.wheel-btn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-origin: -10px 0px;
+    width: 90px;
+    height: 36px;
+    font-size: 0.95em;
+    font-family: 'Press Start 2P', monospace;
+    background: #23232b;
+    color: #e0e0e0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    box-shadow: none;
+    text-align: center;
+    padding: 0 8px;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.nutrient-btn.wheel-btn.selected, .nutrient-btn.wheel-btn:hover, .nutrient-btn.wheel-btn:active {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+    z-index: 2;
+}
+
+.nutrient-scroll-wheel {
+    width: 240px !important;
+    min-width: 220px;
+    max-width: 320px;
+    padding: 10px 0 10px 0;
+}
+
+.nutrient-scroll-btn {
+    width: 140px;
+    margin: 0 auto 2px auto;
+    font-size: 0.85em;
+    background: #23232b;
+    color: #e0e0e0;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    box-shadow: none;
+    text-align: center;
+    padding: 2px 8px;
+    opacity: 0.6;
+    z-index: 1;
+    white-space: nowrap;
+    outline: none;
+}
+
+.nutrient-scroll-btn.selected {
+    background: #18141a;
+    color: #e0e0e0;
+    border-color: #fff;
+    font-size: 1em;
+    opacity: 1;
+    z-index: 2;
+}
+
+.scroll-arrow {
+    width: 100%;
+    min-width: 200px;
+    max-width: 300px;
+    height: 32px;
+    font-size: 1.5em;
+    background: none;
+    border: none;
+    color: #bfcfff;
+    border-radius: 8px;
+    margin: 2px 0;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.2s, background 0.2s;
+}
+
+.scroll-arrow:hover, .scroll-arrow:active {
+    color: #ffd700;
+    background: #23232b;
+}
+
+.name-input-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 16, 32, 0.88);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.name-input-bg {
+    position: relative;
+    width: 672px;
+    height: 672px;
+    margin: 0 auto;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px #000b, 0 0 0 2px #bfcfff;
+    background: #23232b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.intro-bg-img {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0.82;
+    pointer-events: none;
+}
+.name-input-content {
+    position: relative;
+    z-index: 2;
+    background: rgba(24, 20, 26, 0.82);
+    border-radius: 18px;
+    padding: 24px 24px 18px 24px;
+    box-shadow: 0 2px 12px #000a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 85%;
+    margin: 0 auto;
+}
+.name-input-content h2 {
+    font-size: 1.1em;
+    margin-bottom: 1.2rem;
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#growerNameInput {
+    font-size: 0.95em;
+    padding: 0.5rem 0.7rem;
+    margin-bottom: 0.8rem;
+    border-radius: 6px;
+    border: 2px solid #bfcfff;
+    background: #23141c;
+    color: #bfcfff;
+    width: 90%;
+    max-width: 220px;
+    font-family: 'Press Start 2P', monospace;
+}
+#confirmNameBtn {
+    font-size: 1em;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    background: #bfcfff;
+    color: #23141c;
+    border: none;
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0.2rem;
+}
+#confirmNameBtn:hover {
+    background: #9ba8d9;
+}
+@media (max-width: 700px) {
+    .name-input-bg {
+        width: 98vw;
+        height: 98vw;
+        min-width: 220px;
+        min-height: 220px;
+        max-width: 98vw;
+        max-height: 98vw;
+        border-radius: 18px;
+    }
+}
+
+.grower-name {
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.high-scores {
+    background: #2a1f2e;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem auto;
+    max-width: 800px;
+    border: 2px solid #bfcfff;
+}
+
+.high-scores h3 {
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.scores-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 0;
+    overflow: hidden;
+}
+
+.score-section {
+    background: #18141a;
+    padding: 18px 10px 14px 10px;
+    border-radius: 8px;
+    border: 2px solid #23232b;
+    margin-bottom: 0;
+    min-height: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
+}
+
+.score-section h4 {
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+#potencyScores, #yieldScores, #averagePotencyScores {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+.score-entry {
+    background: #23232b;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-family: 'Press Start 2P', monospace;
+    color: #e0e0e0;
+    text-align: center;
+    margin: 0;
+}
+
+.high-scores-hud {
+    position: relative;
+    height: 700px;
+    min-height: 700px;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 320px;
+    min-width: 220px;
+    padding: 24px 16px 24px 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.high-scores-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 0;
+    box-sizing: border-box;
+}
+
+.high-scores-content h3 {
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    margin-top: 0;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 1200px) {
+    .main-game-area {
+        flex-direction: column;
+    }
+    .plant-hud, .high-scores-hud {
+        width: 100%;
+        min-width: 0;
+        border-right: none;
+        border-left: none;
+        border-bottom: 3px solid #18141a;
+        padding: 16px 0;
+        height: auto;
+    }
+    .high-scores-hud {
+        border-radius: 0;
+    }
+    .scores-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 16px;
+    }
+    .score-section {
+        flex: 1;
+        max-width: 300px;
+    }
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.main-title {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.grower-name {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* 1. Water number display as square, not circle */
+.water-display {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    background: #23232b;
+    color: #7fbbff;
+    font-size: 2.2em;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #4a4a55;
+    box-shadow: 0 0 8px rgba(127, 187, 255, 0.12);
+    margin: 0 8px;
+}
+
+/* 2. Plus/minus buttons: big, bold, modern */
+.water-btn {
+    width: 48px;
+    height: 60px;
+    border-radius: 10px;
+    background: #2a2a35;
+    color: #e0e0e0;
+    font-size: 2.5em;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+.water-btn:active, .water-btn:hover {
+    background: #44445a;
+    color: #fff;
+}
+
+/* 3. Make nutrient scroll selectors wider */
+.nutrient-scroll-wheel {
+    width: 240px !important;
+    min-width: 220px;
+    max-width: 320px;
+    padding: 10px 0 10px 0;
+}
+.nutrient-option {
+    width: 95%;
+    min-width: 200px;
+    max-width: 300px;
+    margin: 4px 0;
+    padding: 10px 12px;
+    background: rgba(42, 42, 53, 0.9);
+    border: 2px solid rgba(224, 224, 224, 0.2);
+    border-radius: 8px;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.nutrient-option.selected, .nutrient-option:active, .nutrient-option:hover {
+    background: #23232b;
+    border-color: #ffd700;
+}
+
+/* 4. Mix title font smaller, one line; subtext two lines */
+.nutrient-option .mix-title {
+    font-size: 1em;
+    font-family: 'Press Start 2P', monospace;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+    width: 100%;
+}
+.nutrient-option .mix-desc {
+    font-size: 0.8em;
+    color: #bfcfff;
+    opacity: 0.8;
+    line-height: 1.2;
+    max-height: 2.4em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+}
+
+/* 5. Scroll arrows match new width */
+.scroll-arrow {
+    width: 100%;
+    min-width: 200px;
+    max-width: 300px;
+    height: 32px;
+    font-size: 1.5em;
+    background: none;
+    border: none;
+    color: #bfcfff;
+    border-radius: 8px;
+    margin: 2px 0;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.2s, background 0.2s;
+}
+.scroll-arrow:hover, .scroll-arrow:active {
+    color: #ffd700;
+    background: #23232b;
+}
+
+/* Feeding schedule bottom button row alignment fix */
+.feeding-buttons-row {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Ensures vertical alignment */
+    gap: 32px;
+    margin-top: 36px;
+}
+.feeding-buttons-row button {
+    height: 56px;
+    min-width: 180px;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 15px;
+    box-sizing: border-box;
+}
+
+/* --- Seed & Soil Selection Modernization --- */
+.selection-screen {
+    background: #23232b;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px #000a, 0 0 0 2px #18141a;
+    color: #e0e0e0;
+    text-align: center;
+    max-width: none;
+    width: auto;
+    margin: 0 auto;
+    padding: 16px 16px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.selection-grid {
+    display: inline-flex;
+    gap: 32px;
+    justify-content: center;
+    align-items: flex-start;
+    width: auto;
+    margin-bottom: 18px;
+}
+.selection-column {
+    background: rgba(35, 35, 43, 0.6);
+    border-radius: 15px;
+    padding: 16px 6px 16px 6px;
+    min-width: 208px;
+    max-width: 256px;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 12px #000a;
+    border: 2px solid rgba(224,224,224,0.08);
+}
+.section-title {
+    color: #ffd700;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.2em;
+    margin-bottom: 14px;
+    margin-top: 0;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px #000a;
+}
+/* Remove flexbox-based .seed-options, .soil-options rule to prevent override */
+/* .seed-options, .soil-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+} */
+.seed-option, .soil-option {
+    background: none;
+    border-radius: 10px;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    min-width: 0;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    display: block !important;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+    overflow: hidden;
+}
+.seed-option.selected, .soil-option.selected {
+    box-shadow: 0 0 24px 8px #bfcfff, 0 0 0 2px #ffd700;
+    border-color: #ffd700;
+    background: #23232b;
+}
+.seed-option:hover, .soil-option:hover {
+    box-shadow: 0 0 24px 8px #e0e0e0, 0 0 0 2px #bfcfff;
+    border-color: #bfcfff;
+    background: #23232b;
+}
+.seed-img, .soil-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border: none;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: none;
+    position: static;
+}
+.seed-option.selected .seed-img,
+.soil-option.selected .soil-img {
+    border-color: #ffd700;
+    box-shadow: 0 0 0 2px #ffd700;
+}
+.seed-option:hover .seed-img,
+.soil-option:hover .soil-img {
+    border-color: #bfcfff;
+    box-shadow: 0 0 0 2px #bfcfff;
+}
+.seed-name, .soil-name {
+    font-weight: bold;
+    color: #e0e0e0;
+    margin-bottom: 2px;
+    font-size: 0.8em;
+    text-shadow: none;
+    font-family: 'Press Start 2P', monospace;
+    text-align: center;
+}
+@media (max-width: 900px) {
+    .selection-grid {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+    }
+    .selection-column {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
+.tools-tab {
+    position: fixed;
+    left: 32px;
+    bottom: 32px;
+    z-index: 3001;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.tools-tab-label {
+    background: #111;
+    color: #bfcfff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.95em;
+    padding: 6px 18px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #000a;
+    border: 2px solid #44445a;
+    border-bottom: none;
+    transition: background 0.2s, color 0.2s;
+}
+.tools-tab-label:hover {
+    background: #222;
+    color: #ffd700;
+}
+.tools-tab-content {
+    display: none;
+    background: #18141a;
+    border: 2px solid #44445a;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 8px #000a;
+    padding: 12px 18px 12px 18px;
+    min-width: 180px;
+    align-items: center;
+}
+.tools-tab.open .tools-tab-content {
+    display: flex;
+}
+#resetHighScoresBtn {
+    background: #23232b;
+    color: #fff;
+    border: 2px solid #bfcfff;
+    border-radius: 6px;
+    font-size: 1em;
+    padding: 8px 0;
+    margin: 0;
+    width: 100%;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+#resetHighScoresBtn:hover {
+    background: #ff1744;
+    color: #fff;
+}
+.event-log {
+    font-size: 0.75em;
+}
+
+#seedSoilDisplay {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+.seed-soil-square {
+    flex: 1 1 0;
+    aspect-ratio: 1 / 1;
+    background: #23232b;
+    border-radius: 10px;
+    border: 1.5px solid #bfcfff;
+    box-shadow: 0 1px 9px #000a, 0 0 0 3px #23232b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-width: 0;
+    margin: 0 2px;
+    position: relative;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+.seed-soil-square img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+.seed-soil-square .seed-name, .seed-soil-square .soil-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(24, 20, 26, 0.35);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.53em;
+    font-weight: bold;
+    text-align: center;
+    padding: 1px 0 1px 0;
+    border-radius: 0 0 8px 8px;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 2;
+    letter-spacing: 0.5px;
+}
+
+.seed-bank-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    min-height: 56px;
+}
+.seed-bank-display img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #bfcfff;
+    box-shadow: 0 2px 8px #000a;
+    margin-bottom: 4px;
+}
+.seed-bank-display div {
+    font-family: 'Press Start 2P', monospace;
+    color: #ffd700;
+    font-size: 1em;
+    text-align: center;
+}
+
+.defense-options {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    justify-items: stretch;
+    align-items: stretch;
+}
+
+.defense-option {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    background: none;
+    border-radius: 10px;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    display: block !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.defense-option.selected {
+    box-shadow: 0 0 16px 4px #fff, 0 0 0 2px #fff;
+    border-color: #fff;
+    background: #23232b;
+}
+
+.defense-option:hover {
+    box-shadow: 0 0 16px 4px #bfcfff, 0 0 0 2px #bfcfff;
+    border-color: #bfcfff;
+    background: #23232b;
+}
+
+.defense-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border: none;
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: none;
+    position: static;
+}
+
+.defense-name, .defense-desc {
+    background: rgba(24, 20, 26, 0.35);
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-align: center;
+    padding: 1px 0 1px 0;
+    border-radius: 0 0 8px 8px;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.defense-name {
+    bottom: 20px;
+}
+
+.defense-desc {
+    bottom: 0;
+    font-size: 0.6em;
+    font-weight: normal;
+    color: #bfcfff;
+}
+
+@media (max-width: 700px) {
+    .selection-screen {
+        padding: 6px 2vw 10px 2vw;
+        min-height: unset;
+        max-width: 100vw;
+        width: 100vw;
+        box-sizing: border-box;
+    }
+    .selection-grid {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .selection-column {
+        padding: 8px 2px 8px 2px;
+        min-width: 0;
+        max-width: 100vw;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .seed-img, .soil-img, .defense-img {
+        max-width: 64px;
+        max-height: 64px;
+    }
+    .seed-option, .soil-option, .defense-option {
+        aspect-ratio: 1/1;
+        min-width: 48px;
+        min-height: 48px;
+        max-width: 80px;
+        max-height: 80px;
+    }
+    .section-title {
+        font-size: 1em;
+        margin-bottom: 6px;
+    }
+    #startGameBtn {
+        font-size: 0.9em;
+        padding: 8px 0.5em;
+        margin-top: 8px;
+    }
+    #seedBankSelectionDisplay {
+        font-size: 1em !important;
+        margin-top: 4px !important;
+    }
+}
+
+@media (max-width: 500px) {
+    .selection-screen {
+        padding: 2px 1vw 4px 1vw;
+    }
+    .selection-column {
+        padding: 4px 0 4px 0;
+    }
+    .seed-img, .soil-img, .defense-img {
+        max-width: 44px;
+        max-height: 44px;
+    }
+    .seed-option, .soil-option, .defense-option {
+        max-width: 56px;
+        max-height: 56px;
+    }
+    .section-title {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 700px) {
+  .seed-options,
+  .soil-options,
+  .defense-options {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    width: 100%;
+    justify-content: center;
+    align-items: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 4px;
+  }
+  .seed-option, .soil-option, .defense-option {
+    min-width: 56px;
+    min-height: 56px;
+    max-width: 80px;
+    max-height: 80px;
+    flex: 0 0 auto;
+  }
+}
+
+#mobileMessage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #18141a;
+    color: #ffd700;
+    font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 4000; /* Ensure it's on top */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    #nameInputScreen,
+    #selectionScreen,
+    #gameSection {
+        display: none !important;
+    }
+    #mobileMessage {
+        display: flex;
+    }
+}
+
+@media (min-width: 901px) {
+    #mobileMessage {
+        display: none !important;
+    }
+} 

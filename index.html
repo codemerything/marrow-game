@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marrow Grow</title>
+    <link rel="stylesheet" href="src/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <div class="header-content">
+                <h1 class="main-title">Marrow Grow</h1>
+                <div id="growerName" class="grower-name"></div>
+            </div>
+        </header>
+        <div id="nameInputScreen" class="name-input-screen">
+            <div class="name-input-bg">
+                <img src="img/selections/introimage.png" alt="Intro" class="intro-bg-img" />
+                <div class="name-input-content">
+                    <h2 id="growerNamePrompt">Enter your Grower name</h2>
+                    <input id="growerNameInput" type="text" maxlength="16" autocomplete="off" placeholder="Grower name..." />
+                    <button id="confirmNameBtn">Begin Growing</button>
+                </div>
+            </div>
+        </div>
+        <div id="gameSection" class="game-layout hidden">
+            <main class="main-game-area" style="position: relative; height: 700px; min-height: 700px; display: flex; flex-direction: row;">
+                <aside class="plant-hud" style="height: 700px; min-height: 700px;">
+                    <div class="plant-image-section" style="height: 60%; display: flex; align-items: center; justify-content: center;">
+                        <img id="plantStageImage" src="img/stages/sprout.png" alt="Plant Stage" />
+                    </div>
+                    <div id="seedSoilDisplay" style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px;">
+                        <div id="seedSquare" class="seed-soil-square"></div>
+                        <div id="soilSquare" class="seed-soil-square"></div>
+                    </div>
+                </aside>
+                <div id="gameContainer" class="game-container hidden" style="flex: 1;">
+                    <div class="game-header">
+                        <div class="stage-info">
+                            <div class="stage-name">Stage: <span id="currentStage">Germinating</span></div>
+                            <div class="stage-timer">Night: <span id="currentDay">1</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-sections">
+                        <div class="progress-section">
+                            <div class="progress-label">Crypt Sprout</div>
+                            <div class="progress-bar">
+                                <div id="germProgress" class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-label">Bone Growth</div>
+                            <div class="progress-bar">
+                                <div id="vegProgress" class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="progress-section">
+                            <div class="progress-label">Phantom Bloom</div>
+                            <div class="progress-bar">
+                                <div id="flowerProgress" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="game-controls">
+                        <button id="waterBtn">Water</button>
+                        <button id="feedBtn">Feed</button>
+                        <label for="lightSlider" style="margin: 0 12px; color: #bfcfff; font-family: 'Press Start 2P', 'Courier New', Courier, monospace; font-size: 1em;">Set Light</label>
+                        <input type="range" id="lightSlider" min="0" max="100" value="100" style="vertical-align: middle; width: 120px;">
+                        <button id="inspectBtn">Inspect</button>
+                    </div>
+                    <div class="stats">
+                        <div>Fud Tears: <span id="waterLevel">100</span>%</div>
+                        <div>Ghost Light: <span id="lightLevel">100</span>%</div>
+                        <div>Bone Meal: <span id="nutrientLevel">100</span>%</div>
+                        <div>Dread: <span id="stressLevel">0</span>%</div>
+                    </div>
+                    <div id="scheduleDisplay" class="schedule-info hidden">
+                        <h3>Current Schedule</h3>
+                        <p>Water Times: <span id="currentWaterTimes">0</span> per day</p>
+                        <p>Nutrient Mix: <span id="currentNutrientMix">None</span></p>
+                    </div>
+                    <div id="statusDisplay" class="status-display hidden">
+                        <h3>Crypt Cookie Status</h3>
+                        <div id="plantStatus"></div>
+                    </div>
+                </div>
+                <aside class="high-scores-hud" style="height: 700px; min-height: 700px;">
+                    <div class="high-scores-content">
+                        <div class="scores-container">
+                            <div class="score-section">
+                                <h4>Highest Potency</h4>
+                                <div id="potencyScores"></div>
+                            </div>
+                            <div class="score-section">
+                                <h4>Total Yield</h4>
+                                <div id="yieldScores"></div>
+                            </div>
+                            <div class="score-section">
+                                <h4>Average Potency</h4>
+                                <div id="averagePotencyScores"></div>
+                            </div>
+                            <div class="score-section">
+                                <h4>Seed Bank</h4>
+                                <div id="seedBankScores"></div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="tools-tab" id="toolsTab">
+                    <div class="tools-tab-label" id="toolsTabLabel">Tools</div>
+                    <div class="tools-tab-content" id="toolsTabContent">
+                        <button id="resetHighScoresBtn" style="width: 100%;">Reset High Scores</button>
+                        <button id="toggleSpeedBtn" style="width: 100%; margin-top: 8px;">2x Speed</button>
+                    </div>
+                </div>
+                <div id="pestPopup" class="pest-popup hidden" style="position: absolute; top: 32px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); color: #fff; padding: 1.2rem 1.5rem; border-radius: 10px; border: 2px solid #ffd700; z-index: 2000; text-align: center; min-width: 260px; max-width: 340px; box-shadow: 0 4px 24px #000a;">
+                    <div style="font-size: 1.1em; color: #ffd700; margin-bottom: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace;">Pests have invaded!</div>
+                    <div style="margin-bottom: 1em; font-size: 1em;">Shoo them away before they damage your plant!</div>
+                    <button id="shooBugsBtn" style="background: #ff6b6b; color: #fff; border: none; padding: 0.6em 1.2em; border-radius: 6px; font-size: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace; cursor: pointer;">Shoo Bugs!</button>
+                </div>
+                <div id="raiderPopup" class="raider-popup hidden" style="position: absolute; top: 32px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); color: #fff; padding: 1.2rem 1.5rem; border-radius: 10px; border: 2px solid #ffd700; z-index: 2000; text-align: center; min-width: 260px; max-width: 340px; box-shadow: 0 4px 24px #000a;">
+                    <div style="font-size: 1.1em; color: #ffd700; margin-bottom: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace;">Skele Raiders!</div>
+                    <div style="margin-bottom: 1em; font-size: 1em;">Send your hounds to chase them off before they steal your yield!</div>
+                    <button id="sendHoundsBtn" style="background: #ff6b6b; color: #fff; border: none; padding: 0.6em 1.2em; border-radius: 6px; font-size: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace; cursor: pointer;">Send Hounds!</button>
+                </div>
+                <div id="nutrientPopup" class="nutrient-popup hidden" style="position: absolute; top: 32px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.95); color: #fff; padding: 1.2rem 1.5rem; border-radius: 10px; border: 2px solid #ffd700; z-index: 2000; text-align: center; min-width: 260px; max-width: 340px; box-shadow: 0 4px 24px #000a;">
+                    <div style="font-size: 1.1em; color: #ffd700; margin-bottom: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace;">Nutrient Boost Opportunity!</div>
+                    <div style="margin-bottom: 1em; font-size: 1em;">Add a special nutrient boost for extra potency!</div>
+                    <button id="nutrientBoostBtn" style="background: #4CAF50; color: #fff; border: none; padding: 0.6em 1.2em; border-radius: 6px; font-size: 1em; font-family: 'Press Start 2P', 'Courier New', Courier, monospace; cursor: pointer;">Add Nutrient Boost!</button>
+                </div>
+            </main>
+        </div>
+        <div id="selectionScreen" class="selection-screen">
+            <div class="selection-grid">
+                <div class="selection-column">
+                    <h3 class="section-title">Seed Selection</h3>
+                    <div class="seed-options">
+                        <div class="seed-option" data-seed-type="cryptcookies">
+                            <img src="img/selections/seed1.png" alt="Crypt Cookies" class="seed-img" />
+                            <div class="seed-name">Crypt Cookies</div>
+                        </div>
+                        <div class="seed-option" data-seed-type="skeleskittlez">
+                            <img src="img/selections/seed2.png" alt="Skele Skittlez" class="seed-img" />
+                            <div class="seed-name">Skele Skittlez</div>
+                        </div>
+                        <div class="seed-option" data-seed-type="hellhoundhaze">
+                            <img src="img/selections/seed3.png" alt="Hellhound Haze" class="seed-img" />
+                            <div class="seed-name">Hellhound Haze</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selection-column">
+                    <h3 class="section-title">Soil Selection</h3>
+                    <div class="soil-options">
+                        <div class="soil-option" data-soil-type="ossuary">
+                            <img src="img/selections/soil1.png" alt="Ossuary Mix" class="soil-img" />
+                            <div class="soil-name">Bone Dust</div>
+                        </div>
+                        <div class="soil-option" data-soil-type="graveblend">
+                            <img src="img/selections/soil2.png" alt="Grave Blend" class="soil-img" />
+                            <div class="soil-name">Magic Moss</div>
+                        </div>
+                        <div class="soil-option" data-soil-type="marrowmoss">
+                            <img src="img/selections/soil3.png" alt="Marrow Moss" class="soil-img" />
+                            <div class="soil-name">Eh.. Not sure</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="selection-column">
+                    <h3 class="section-title">Defense Selection</h3>
+                    <div class="defense-options">
+                        <div class="defense-option" data-defense-type="grower">
+                            <img src="img/selections/seed1.png" alt="Grower" class="defense-img" />
+                            <div class="defense-name">Grower</div>
+                            <div class="defense-desc">Defends against pests</div>
+                        </div>
+                        <div class="defense-option" data-defense-type="hound">
+                            <img src="img/selections/seed2.png" alt="Hound" class="defense-img" />
+                            <div class="defense-name">Hound</div>
+                            <div class="defense-desc">Defends against raiders</div>
+                        </div>
+                        <div class="defense-option" data-defense-type="vault">
+                            <img src="img/selections/seed3.png" alt="Vault" class="defense-img" />
+                            <div class="defense-name">Vault</div>
+                            <div class="defense-desc">Protects your seeds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="startGameBtn" class="start-button" disabled>Begin the Ritual</button>
+            <div id="seedBankSelectionDisplay" class="score-entry" style="font-size:1.1em;color:#ffd700;text-align:center;margin-top:10px;">Seeds: <span style='color:#fff;'>0</span></div>
+        </div>
+    </div>
+    <div id="mobileMessage">
+        Not available for mobile screens, switch to desktop
+    </div>
+
+    <div id="harvestWindow" class="harvest-window hidden">
+        <div class="harvest-content">
+            <h2>Ready for Harvest!</h2>
+            <div class="harvest-timer">Time until potency loss: <span id="harvestCountdown">24:00:00</span></div>
+            <div class="harvest-stats">
+                <div>Current Potency: <span id="currentPotency">100</span>%</div>
+                <div>Current Weight: <span id="currentWeight">100</span>g</div>
+            </div>
+            <button id="harvestBtn" class="harvest-button">Harvest Now</button>
+        </div>
+    </div>
+
+    <div id="harvestResults" class="harvest-results hidden">
+        <div class="results-content">
+            <h2>Harvest Complete!</h2>
+            <div class="final-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Strain Name:</span>
+                    <span id="finalStrainName"></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Final Weight:</span>
+                    <span id="finalWeight"></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Final Potency:</span>
+                    <span id="finalPotency"></span>
+                </div>
+            </div>
+            <img id="finalPlantImage" class="final-plant-image" src="" alt="Harvested Plant">
+            <div id="seedBankDisplay" class="seed-bank-display"></div>
+            <div id="lookForSeedsMsg" style="text-align:center;margin:10px 0;color:#ffd700;font-family:'Press Start 2P',monospace;"></div>
+            <button id="lookForSeedsBtn" class="look-for-seeds-button" style="margin-bottom:12px;">Look for Seeds</button>
+            <button id="newGameBtn" class="new-game-button" disabled>Start New Game</button>
+        </div>
+    </div>
+
+    <script src="src/js/config.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/view.js"></script>
+    <script src="src/js/game.js"></script>
+</body>
+</html> 
