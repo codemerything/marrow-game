@@ -88,40 +88,16 @@ function getSeedLockoutTimeLeft() {
     return msLeft > 0 ? msLeft : 0;
 }
 
-// --- Grower Name Local Storage ---
-function saveGrowerName(name) {
-    localStorage.setItem('marrowGrowLastGrower', name);
-}
-function loadGrowerName() {
-    return localStorage.getItem('marrowGrowLastGrower') || '';
-}
-
 // On name confirm, ensure player has lives or set up lockout
 function initializeNameInput() {
     const nameInput = document.getElementById('growerNameInput');
     const confirmBtn = document.getElementById('confirmNameBtn');
     const nameInputScreen = document.getElementById('nameInputScreen');
     const selectionScreen = document.getElementById('selectionScreen');
-    const namePrompt = document.getElementById('growerNamePrompt');
-    // Auto-fill last grower name if present
-    const lastName = loadGrowerName();
-    nameInput.value = lastName;
-    if (lastName) {
-        namePrompt.textContent = `Welcome ${lastName}!`;
-        confirmBtn.textContent = 'Continue Growing';
-        nameInput.style.visibility = 'hidden';
-        nameInput.style.pointerEvents = 'none';
-    } else {
-        namePrompt.textContent = 'Enter your Grower name';
-        confirmBtn.textContent = 'Begin Growing';
-        nameInput.style.visibility = 'visible';
-        nameInput.style.pointerEvents = 'auto';
-    }
     confirmBtn.addEventListener('click', () => {
         const name = nameInput.value.trim();
         if (name) {
             currentGrower = name;
-            saveGrowerName(name);
             document.getElementById('growerName').textContent = `Grower: ${name}`;
             // Always give lives if new player or after lockout
             if (!highScores.seedLives) highScores.seedLives = {};
@@ -135,6 +111,10 @@ function initializeNameInput() {
             checkSeedLockoutUI();
             updateHighScoresDisplay();
             updateSeedBankSelectionDisplay();
+            // Show slots modal after login if eligible
+            setTimeout(function() {
+                if (canSpinSlotsToday()) showSlotsModal();
+            }, 400);
         }
     });
     nameInput.addEventListener('keypress', (e) => {
@@ -231,7 +211,7 @@ var plant = {
     harvestTimer: null,
     harvestTimeLeft: 24 * 60 * 60, // 24 hours in seconds
     potency: 100,
-    weight: 1000,
+    weight: 0, // Changed from 1000 to 0
     healthSum: 0,
     healthTicks: 0,
     optimalLight: 100,
@@ -436,20 +416,18 @@ function startGame() {
 function maybeTriggerEvent() {
     if (pestActive || raiderActive || nutrientActive || plant.growthStage >= growthStages.length - 1) return;
 
-    // Acts of god: only once per game, triggered by timer
-    // (No longer random per tick)
     // Flowering stage: can trigger raiders or nutrient boost
     if (growthStages[plant.growthStage].name === 'Flowering') {
-        // 15% chance for raiders, 10% for nutrient boost
+        // 5% chance for raiders, 5% for nutrient boost (reduced from 15% and 10%)
         var rand = Math.random();
-        if (rand < 0.10) {
+        if (rand < 0.05) {
             showNutrientEvent();
-        } else if (rand < 0.25) {
+        } else if (rand < 0.10) {
             showRaiderEvent();
         }
     } else {
-        // 20% chance for pests (increased from 15%)
-        if (Math.random() < 0.20) {
+        // 5% chance for pests (reduced from 20%)
+        if (Math.random() < 0.05) {
             showPestEvent();
         }
     }
@@ -473,7 +451,7 @@ function showPestEvent() {
         if (defenseSuccess) {
             addEventToLog(`${pestType.name} were successfully repelled!`, 'info');
         } else {
-            const damagePercent = Math.floor(Math.random() * (pestType.damage[1] - pestType.damage[0])) + pestType.damage[0];
+            const damagePercent = Math.floor(Math.random() * 10) + 5; // Reduced damage range (5-15%)
             plant.pestPenalty *= (1 - (damagePercent / 100));
             addEventToLog(`${pestType.name} reduced potency by ${damagePercent}%.`, 'error');
         }
@@ -499,7 +477,7 @@ function showRaiderEvent() {
         if (defenseSuccess) {
             addEventToLog(`${raidType.name} were successfully repelled!`, 'info');
         } else {
-            const damagePercent = Math.floor(Math.random() * (raidType.damage[1] - raidType.damage[0])) + raidType.damage[0];
+            const damagePercent = Math.floor(Math.random() * 10) + 5; // Reduced damage range (5-15%)
             plant.raiderPenalty *= (1 - (damagePercent / 100));
             addEventToLog(`${raidType.name} reduced yield by ${damagePercent}%.`, 'error');
         }
@@ -684,70 +662,92 @@ function autoHarvestPlant() {
     let stats = plant.frozenStats || plant;
     // Calculate average health
     let avgHealth = stats.healthTicks > 0 ? stats.healthSum / stats.healthTicks / 100 : 1;
-    // Calculate average light efficiency
-    let avgLightEff = stats.lightEfficiencyTicks > 0 ? stats.lightEfficiencySum / stats.lightEfficiencyTicks : 1;
-    // Combine for yield and potency with separate penalties
-    let finalPotencyRaw = stats.potency * avgLightEff * stats.potencyBoost * stats.pestPenalty;
-    let finalWeightRaw = stats.weight * avgHealth * stats.raiderPenalty;
-    // Scale potency so perfect play is 66%
-    let finalPotency = Math.round(finalPotencyRaw * 0.66);
-    let finalWeight = Math.round(finalWeightRaw); // <-- This is the correct yield calculation
-    finalPotency = Math.max(0, Math.min(100, finalPotency));
-    finalWeight = Math.max(0, Math.min(stats.weight, finalWeight)); // Clamp to max possible weight
+    
+    // Base potency calculation with natural distribution
+    // Start with a base of 20-30%
+    let basePotency = 20 + (Math.random() * 10);
+    
+    // Add a small chance for higher potency (up to 70%)
+    if (Math.random() < 0.2) { // 20% chance for higher potency
+        basePotency = 30 + (Math.random() * 40); // 30-70% range
+    }
+    
+    // Apply modifiers
+    let finalPotencyRaw = basePotency * stats.potencyBoost * stats.pestPenalty;
+    
+    // Base yield calculation (1-200g range)
+    let baseYield = 1 + (Math.random() * 199); // Random base between 1-200
+    let lightBonus = lightSources[currentLight]?.yieldBonus || 1.0;
+    let finalWeightRaw = baseYield * avgHealth * stats.raiderPenalty * lightBonus;
+    
+    // Final calculations with strict potency cap
+    let finalPotency = Math.round(finalPotencyRaw);
+    let finalWeight = Math.round(finalWeightRaw);
+    
+    // Clamp values - ensure potency never exceeds 70%
+    finalPotency = Math.max(0, Math.min(70, finalPotency));
+    finalWeight = Math.max(1, Math.min(200, finalWeight));
+    
     // Debug log for harvest calculation
     console.log('HARVEST DEBUG:', {
         avgHealth,
-        avgLightEff,
+        basePotency,
+        baseYield,
         pestPenalty: stats.pestPenalty,
         raiderPenalty: stats.raiderPenalty,
         potencyBoost: stats.potencyBoost,
-        potency: stats.potency,
-        weight: stats.weight,
         finalPotencyRaw,
         finalPotency,
         finalWeightRaw,
         finalWeight,
-        healthSum: stats.healthSum,
-        healthTicks: stats.healthTicks,
-        lightEfficiencySum: stats.lightEfficiencySum,
-        lightEfficiencyTicks: stats.lightEfficiencyTicks,
-        optimalLight: stats.optimalLight,
-        light: stats.light
+        lightBonus,
+        currentLight
     });
+    
     // Always allow score registration at harvest
     if (!plant.scoresRecorded && finalPotency !== null && finalWeight !== null && plant.frozenStats) {
         addScore('potency', finalPotency);
         addScore('yield', finalWeight);
+        checkAndUnlockLights(); // <-- Unlock lights immediately after yield is added
         plant.scoresRecorded = true;
     }
-    showHarvestResults(finalPotency, finalWeight); // Pass the calculated values
+    showHarvestResults(finalPotency, finalWeight);
 }
 
 // Update plant status
 function updatePlantStatus() {
     const lightDiff = Math.abs(plant.light - plant.optimalLight);
-    // Softer stress logic
+    
+    // Softer stress logic with relief
     if (lightDiff > 35) {
-        plant.stress = Math.min(100, plant.stress + 1);
+        plant.stress = Math.min(100, plant.stress + 0.5); // Reduced from 1 to 0.5
     } else {
-        plant.stress = Math.max(0, plant.stress - 3); // recover faster
+        plant.stress = Math.max(0, plant.stress - 1); // Increased recovery from 0.5 to 1
     }
+    
+    // Resource-based stress with relief
     if (plant.water <= 0 || plant.nutrients <= 0) {
-        plant.stress = Math.min(100, plant.stress + 2);
+        plant.stress = Math.min(100, plant.stress + 1);
     } else if (plant.water < 30 || plant.nutrients < 30) {
-        plant.stress = Math.min(100, plant.stress + 1);
+        plant.stress = Math.min(100, plant.stress + 0.5); // Reduced from 1 to 0.5
     } else if (plant.water > 95 || plant.nutrients > 95) {
-        plant.stress = Math.min(100, plant.stress + 1);
+        plant.stress = Math.min(100, plant.stress + 0.5); // Reduced from 1 to 0.5
+    } else {
+        // Relief when resources are in good range
+        plant.stress = Math.max(0, plant.stress - 0.5);
     }
-    // Health penalty: only 1 per tick if anything is bad
+    
+    // Health penalty: only 0.5 per tick if anything is bad
     let healthPenalty = 0;
-    if (plant.water < 30 || plant.water > 95) healthPenalty = 1;
-    if (plant.nutrients < 30 || plant.nutrients > 95) healthPenalty = 1;
-    if (lightDiff > 35) healthPenalty = 1;
-    if (plant.stress > 80) healthPenalty = 1;
+    if (plant.water < 30 || plant.water > 95) healthPenalty = 0.5;
+    if (plant.nutrients < 30 || plant.nutrients > 95) healthPenalty = 0.5;
+    if (lightDiff > 35) healthPenalty = 0.5;
+    if (plant.stress > 80) healthPenalty = 0.5;
+    
     plant.health -= healthPenalty;
     if (plant.health < 0) plant.health = 0;
     if (plant.health > 100) plant.health = 100;
+    
     if (plant.health <= 0) {
         plant.deathTicks = (plant.deathTicks || 0) + 1;
         if (plant.deathTicks >= 3) {
@@ -757,6 +757,7 @@ function updatePlantStatus() {
     } else {
         plant.deathTicks = 0;
     }
+    
     ViewService.updatePlantStatus(plant);
 }
 
@@ -876,6 +877,9 @@ function updatePlantDisplay() {
     elapsed += plant.stageTime;
     var percent = Math.min(100, Math.round((elapsed / plant.totalGrowthTime) * 100));
     document.getElementById('growthProgress').style.width = percent + '%';
+
+    // Render light source selection and purchase UI
+    renderLightSourceUI();
 }
 
 // Add new harvest-related functions
@@ -883,12 +887,18 @@ function showHarvestWindow() {
     document.getElementById('harvestWindow').classList.remove('hidden');
     startHarvestTimer();
     // Calculate final scores for display only
-    const finalPotency = Math.min(100, Math.round(plant.frozenStats.potency * plant.frozenStats.pestPenalty * plant.frozenStats.potencyBoost));
-    const finalWeight = Math.min(100, Math.round(plant.frozenStats.weight * plant.frozenStats.raiderPenalty));
-    // Update display
+    let stats = plant.frozenStats || plant;
+    let avgHealth = stats.healthTicks > 0 ? stats.healthSum / stats.healthTicks / 100 : 1;
+    let finalPotencyRaw = stats.potency * stats.potencyBoost * stats.pestPenalty;
+    let lightBonus = lightSources[currentLight]?.yieldBonus || 1.0;
+    let finalWeightRaw = stats.weight * avgHealth * stats.raiderPenalty * lightBonus;
+    let finalPotency = Math.round(finalPotencyRaw * 0.66);
+    let finalWeight = Math.round(finalWeightRaw);
+    finalPotency = Math.max(0, Math.min(100, finalPotency));
+    finalWeight = Math.max(0, Math.min(stats.weight * lightBonus, finalWeight));
     document.getElementById('currentPotency').textContent = finalPotency;
     document.getElementById('currentWeight').textContent = finalWeight;
-    // (No more addScore here)
+    renderLightSourceUI();
 }
 
 function startHarvestTimer() {
@@ -928,14 +938,11 @@ function updateHarvestDisplay() {
     if (stats.healthTicks > 0) {
         avgHealth = stats.healthSum / stats.healthTicks / 100;
     }
-    // Calculate average light efficiency
-    let avgLightEff = 1;
-    if (stats.lightEfficiencyTicks > 0) {
-        avgLightEff = stats.lightEfficiencySum / stats.lightEfficiencyTicks;
-    }
-    // Combine for yield and potency with separate penalties
-    const currentPotencyRaw = Math.round(stats.potency * avgLightEff * stats.potencyBoost * stats.pestPenalty);
-    const currentWeight = Math.round(stats.weight * avgHealth * stats.raiderPenalty);
+    // Potency is not affected by light anymore
+    const currentPotencyRaw = Math.round(stats.potency * stats.potencyBoost * stats.pestPenalty);
+    // Yield is affected by light
+    let lightBonus = lightSources[currentLight]?.yieldBonus || 1.0;
+    const currentWeight = Math.round(stats.weight * avgHealth * stats.raiderPenalty * lightBonus);
     // Scale potency so perfect play is 66%
     const currentPotency = Math.round(currentPotencyRaw * 0.66);
     document.getElementById('currentPotency').textContent = currentPotency;
@@ -1015,13 +1022,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.getElementById('resetHighScoresBtn');
     if (resetBtn) {
         resetBtn.addEventListener('click', function() {
-            if (isGameLive()) {
-                alert('You cannot reset high scores while a game is live! Please finish or end your current game first.');
-                return;
-            }
             if (confirm('Are you sure you want to reset all high scores?')) {
                 localStorage.removeItem('marrowGrowHighScores');
-                localStorage.removeItem('marrowGrowLastGrower');
                 location.reload();
             }
         });
@@ -1045,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 harvestTimer: null,
                 harvestTimeLeft: 24 * 60 * 60,
                 potency: 100, // set to starting value
-                weight: 1000, // set to starting value
+                weight: 0, // set to starting value
                 healthSum: 0,
                 healthTicks: 0,
                 optimalLight: 100,
@@ -1353,6 +1355,8 @@ function initializeGame() {
     plant.sproutNutrientApplied = false;
     plant.vegetativeNutrientApplied = false;
     plant.floweringNutrientApplied = false;
+    renderLightSourceUI();
+    checkAndUnlockLights();
 }
 
 // Schedule act of god once per game at a random time during growth
@@ -1973,7 +1977,7 @@ function showPestEvent() {
         if (defenseSuccess) {
             addEventToLog(`${pestType.name} were successfully repelled!`, 'info');
         } else {
-            const damagePercent = Math.floor(Math.random() * (pestType.damage[1] - pestType.damage[0])) + pestType.damage[0];
+            const damagePercent = Math.floor(Math.random() * 10) + 5; // Reduced damage range (5-15%)
             plant.pestPenalty *= (1 - (damagePercent / 100));
             addEventToLog(`${pestType.name} reduced potency by ${damagePercent}%.`, 'error');
         }
@@ -1999,7 +2003,7 @@ function showRaiderEvent() {
         if (defenseSuccess) {
             addEventToLog(`${raidType.name} were successfully repelled!`, 'info');
         } else {
-            const damagePercent = Math.floor(Math.random() * (raidType.damage[1] - raidType.damage[0])) + raidType.damage[0];
+            const damagePercent = Math.floor(Math.random() * 10) + 5; // Reduced damage range (5-15%)
             plant.raiderPenalty *= (1 - (damagePercent / 100));
             addEventToLog(`${raidType.name} reduced yield by ${damagePercent}%.`, 'error');
         }
@@ -2029,9 +2033,542 @@ showHarvestResults = function(finalPotency, finalWeight) {
 };
 // ... existing code ...
 
-// --- Game Live State Helper ---
-function isGameLive() {
-    // If plant.growthTimer is set, or gameSection is visible
-    const gameSection = document.getElementById('gameSection');
-    return (plant.growthTimer !== null) || (gameSection && !gameSection.classList.contains('hidden'));
+// --- Daily Slots Mini-Game ---
+function canSpinSlotsToday() {
+    if (!currentGrower) return false;
+    const key = 'slotsSpin_' + currentGrower;
+    const today = new Date().toISOString().slice(0,10);
+    const spins = JSON.parse(localStorage.getItem(key) || '{}');
+    return spins.date !== today || (spins.count || 0) < 5;
 }
+function setSlotsSpinToday() {
+    if (!currentGrower) return;
+    const key = 'slotsSpin_' + currentGrower;
+    const today = new Date().toISOString().slice(0,10);
+    let spins = JSON.parse(localStorage.getItem(key) || '{}');
+    if (spins.date !== today) spins = { date: today, count: 0 };
+    spins.count = (spins.count || 0) + 1;
+    localStorage.setItem(key, JSON.stringify(spins));
+}
+function getSlotsSpinsToday() {
+    if (!currentGrower) return 0;
+    const key = 'slotsSpin_' + currentGrower;
+    const today = new Date().toISOString().slice(0,10);
+    const spins = JSON.parse(localStorage.getItem(key) || '{}');
+    return spins.date === today ? (spins.count || 0) : 0;
+}
+function showSlotsModal() {
+    const modal = document.getElementById('slotsModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    // Reset reels and message
+    document.getElementById('slot1').textContent = '🌱';
+    document.getElementById('slot2').textContent = '💀';
+    document.getElementById('slot3').textContent = '⭐';
+    document.getElementById('slotsResultMsg').textContent = `Spins left today: ${5-getSlotsSpinsToday()}`;
+    document.getElementById('spinSlotsBtn').disabled = false;
+}
+function hideSlotsModal() {
+    const modal = document.getElementById('slotsModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function spinSlots() {
+    const icons = ['🌱','💀','⭐','🦴'];
+    let reels = [];
+    for (let i=0; i<3; i++) {
+        reels.push(icons[Math.floor(Math.random()*icons.length)]);
+    }
+    // Animate reels
+    let steps = 10;
+    let interval = setInterval(()=>{
+        for (let i=0; i<3; i++) {
+            document.getElementById('slot'+(i+1)).textContent = icons[Math.floor(Math.random()*icons.length)];
+        }
+        steps--;
+        if (steps<=0) {
+            clearInterval(interval);
+            // Show final result
+            for (let i=0; i<3; i++) {
+                document.getElementById('slot'+(i+1)).textContent = reels[i];
+            }
+            let msg = '';
+            let seedsWon = 0;
+            if (reels[0]==='🌱' && reels[1]==='🌱' && reels[2]==='🌱') { msg = 'JACKPOT! +3 Seeds!'; seedsWon=3; }
+            else if (reels.filter(x=>x==='🌱').length===2) { msg = '+1 Seed!'; seedsWon=1; }
+            else if (reels[0]==='⭐' && reels[1]==='⭐' && reels[2]==='⭐') { msg = 'Lucky Stars! +2 Seeds!'; seedsWon=2; }
+            else { msg = 'Try again tomorrow!'; }
+            document.getElementById('slotsResultMsg').textContent = msg;
+            if (seedsWon>0) {
+                setLivesForPlayer(getLivesForPlayer()+seedsWon);
+                saveHighScores();
+                updateHighScoresDisplay();
+            }
+            setSlotsSpinToday();
+            document.getElementById('spinSlotsBtn').disabled = true;
+            setTimeout(hideSlotsModal, 2500);
+        }
+    }, 80);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const spinBtn = document.getElementById('spinSlotsBtn');
+    if (spinBtn) spinBtn.onclick = spinSlots;
+});
+// ... existing code ...
+
+// --- Seed Breeding Logic ---
+function canBreedStrain() {
+    return getLivesForPlayer() >= 2;
+}
+function showBreedButtonAfterHarvest() {
+    const btn = document.getElementById('breedStrainBtn');
+    if (!btn) return;
+    if (canBreedStrain()) {
+        btn.style.display = '';
+    } else {
+        btn.style.display = 'none';
+    }
+}
+function showBreedModal() {
+    const modal = document.getElementById('breedModal');
+    if (!modal) return;
+    document.getElementById('newStrainNameInput').value = '';
+    document.getElementById('breedMsg').textContent = '';
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function hideBreedModal() {
+    const modal = document.getElementById('breedModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+function createCustomStrain(strainName, parentKey) {
+    // Use a unique key for the new strain
+    let customKey = 'customstrain_' + Date.now();
+    // Inherit stats from parentKey (default to marrowmint)
+    const parent = seedProperties[parentKey] || seedProperties['marrowmint'];
+    seedProperties[customKey] = {
+        name: strainName,
+        waterDrain: parent.waterDrain,
+        nutrientDrain: parent.nutrientDrain,
+        image: 'seed7.png',
+        desc: `Custom strain bred by ${currentGrower}`,
+        owner: currentGrower
+    };
+    // Save to localStorage for global pool
+    let customStrains = JSON.parse(localStorage.getItem('customStrains') || '{}');
+    customStrains[customKey] = seedProperties[customKey];
+    localStorage.setItem('customStrains', JSON.stringify(customStrains));
+    return customKey;
+}
+function loadCustomStrains() {
+    let customStrains = JSON.parse(localStorage.getItem('customStrains') || '{}');
+    for (let key in customStrains) {
+        if (customStrains[key].owner === currentGrower) {
+            seedProperties[key] = customStrains[key];
+        } else {
+            // Remove from seedProperties if not owned by this user
+            if (seedProperties[key]) delete seedProperties[key];
+        }
+    }
+}
+// Patch seed selection to include custom strains
+if (typeof window.oldRenderSeedOptions === 'undefined') {
+    window.oldRenderSeedOptions = renderSeedOptions;
+    renderSeedOptions = function() {
+        loadCustomStrains();
+        window.oldRenderSeedOptions.apply(this, arguments);
+    };
+}
+// Show/hide breed button after harvest
+if (typeof window.oldShowHarvestResults === 'undefined') {
+    window.oldShowHarvestResults = showHarvestResults;
+    showHarvestResults = function(finalPotency, finalWeight) {
+        window.oldShowHarvestResults.apply(this, arguments);
+        showBreedButtonAfterHarvest();
+    };
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const breedBtn = document.getElementById('breedStrainBtn');
+    const confirmBtn = document.getElementById('confirmBreedBtn');
+    const cancelBtn = document.getElementById('cancelBreedBtn');
+    if (breedBtn) breedBtn.onclick = showBreedModal;
+    if (cancelBtn) cancelBtn.onclick = hideBreedModal;
+    if (confirmBtn) confirmBtn.onclick = function() {
+        const nameInput = document.getElementById('newStrainNameInput');
+        const msgDiv = document.getElementById('breedMsg');
+        let strainName = nameInput.value.trim();
+        if (!strainName || strainName.length < 3) {
+            msgDiv.textContent = 'Name must be at least 3 characters.';
+            return;
+        }
+        // Check for duplicate name
+        for (let key in seedProperties) {
+            if (seedProperties[key].name.toLowerCase() === strainName.toLowerCase()) {
+                msgDiv.textContent = 'That name is already taken.';
+                return;
+            }
+        }
+        // Deduct 2 seeds
+        if (getLivesForPlayer() < 2) {
+            msgDiv.textContent = 'Not enough seeds!';
+            return;
+        }
+        setLivesForPlayer(getLivesForPlayer() - 2);
+        saveHighScores();
+        updateHighScoresDisplay();
+        // Inherit stats from last grown strain (or marrowmint)
+        let parentKey = plant.seedType || 'marrowmint';
+        let newKey = createCustomStrain(strainName, parentKey);
+        msgDiv.textContent = `Strain "${strainName}" created!`;
+        setTimeout(()=>{
+            hideBreedModal();
+            // Optionally, refresh seed selection UI
+            if (typeof renderSeedOptions === 'function') renderSeedOptions();
+        }, 1200);
+    };
+});
+// ... existing code ...
+
+// Light source configuration
+const lightSources = {
+    candle:    { name: 'Candle Light',    price: 0,    yieldBonus: 1.0 },
+    desk:      { name: 'Desk Lamp',       price: 100,  yieldBonus: 1.1 },
+    grow:      { name: 'Grow Light',      price: 500,  yieldBonus: 1.2 },
+    led:       { name: 'LED Panel',       price: 1500, yieldBonus: 1.3 },
+    quantum:   { name: 'Quantum Board',   price: 5000, yieldBonus: 1.5 }
+};
+
+// Player state for owned lights
+let ownedLights = { candle: true };
+let currentLight = 'candle'; // Default starting light
+
+// Render light source selection and purchase UI
+function renderLightSourceUI() {
+    const containerId = 'lightSourceContainer';
+    let container = document.getElementById(containerId);
+    if (!container) {
+        container = document.createElement('div');
+        container.id = containerId;
+        container.style.display = 'flex';
+        container.style.flexDirection = 'row';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+        container.style.gap = '8px';
+        container.style.margin = '10px 0';
+        container.style.flexWrap = 'nowrap';
+        // Insert above resource bars or at top of game controls
+        const gameControls = document.querySelector('.game-controls');
+        if (gameControls) {
+            gameControls.parentNode.insertBefore(container, gameControls);
+        } else {
+            document.body.appendChild(container);
+        }
+    }
+    container.innerHTML = '';
+    // Only show three light options: Candle Light, Grow Light, Quantum Board
+    const lightKeys = ['candle', 'grow', 'quantum'];
+    lightKeys.forEach(key => {
+        const light = lightSources[key];
+        const btn = document.createElement('button');
+        btn.style.minWidth = '90px';
+        btn.style.maxWidth = '120px';
+        btn.style.padding = '6px 4px';
+        btn.style.margin = '0 2px';
+        btn.style.fontFamily = '"Press Start 2P", monospace';
+        btn.style.fontSize = '0.85em';
+        btn.style.borderRadius = '6px';
+        btn.style.border = '1.5px solid #bfcfff';
+        btn.style.background = ownedLights[key] ? '#2ecc71' : '#23232b';
+        btn.style.color = '#fff';
+        btn.style.cursor = 'default';
+        btn.style.boxShadow = 'none';
+        btn.style.display = 'flex';
+        btn.style.flexDirection = 'column';
+        btn.style.alignItems = 'center';
+        btn.style.justifyContent = 'center';
+        btn.style.height = '54px';
+        btn.style.lineHeight = '1.1';
+        let unlockInfo = '';
+        const unlockObj = lightUnlockThresholds.find(l => l.key === key);
+        if (!ownedLights[key] && unlockObj) {
+            unlockInfo = `<div style='font-size:0.7em;color:#bfcfff;opacity:0.7;'>Unlocks at:<br>${unlockObj.threshold}g</div>`;
+        }
+        btn.innerHTML = `<div style='font-weight:bold;'>${light.name}</div>${!ownedLights[key] ? unlockInfo : ''}`;
+        if (!ownedLights[key]) {
+            btn.disabled = true;
+            btn.style.opacity = 0.5;
+        }
+        container.appendChild(btn);
+    });
+}
+
+// Always use the best unlocked light automatically
+function getBestUnlockedLight() {
+    // Use the highest unlocked from the three options
+    const lightKeys = ['quantum', 'grow', 'candle'];
+    for (let i = 0; i < lightKeys.length; i++) {
+        if (ownedLights[lightKeys[i]]) return lightKeys[i];
+    }
+    return 'candle';
+}
+
+// Patch updatePlantDisplay to always use the best unlocked light
+const oldUpdatePlantDisplayWithBestLight = updatePlantDisplay;
+updatePlantDisplay = function() {
+    currentLight = getBestUnlockedLight();
+    oldUpdatePlantDisplayWithBestLight.apply(this, arguments);
+    checkAndUnlockLights();
+};
+
+// Patch updatePlantDisplay to call renderLightSourceUI
+const oldUpdatePlantDisplay = updatePlantDisplay;
+updatePlantDisplay = function() {
+    oldUpdatePlantDisplay.apply(this, arguments);
+    renderLightSourceUI();
+};
+
+// ... existing code ...
+
+// ... existing code ...
+// In initializeGame, remove light slider UI and event
+const oldInitializeGameNoLightSlider = initializeGame;
+initializeGame = function() {
+    // Call the original to set up most of the UI
+    oldInitializeGameNoLightSlider.apply(this, arguments);
+    // Remove the light slider from the DOM if it exists
+    const lightSliderDiv = document.querySelector('.light-control');
+    if (lightSliderDiv && lightSliderDiv.parentNode) {
+        lightSliderDiv.parentNode.removeChild(lightSliderDiv);
+    }
+    // Remove any event listeners or code that sets plant.light from a slider
+    // (No further action needed since slider is gone)
+};
+// ... existing code ...
+
+// ... existing code ...
+// Light ON/OFF state and health drain logic
+let lightIsOn = true;
+let lightOffStartTime = null;
+let lightOffHealthDrainRate = 0;
+
+// Add random light failure trigger
+function maybeTriggerLightFailure() {
+    if (lightIsOn && Math.random() < 0.05) { // Increased from 0.01 to 0.05 (5% chance per tick)
+        turnOffLights();
+    }
+}
+
+function turnOffLights() {
+    if (!lightIsOn) return;
+    lightIsOn = false;
+    lightOffStartTime = Date.now();
+    // Set initial health to random value between 30-70
+    plant.health = Math.floor(Math.random() * 41) + 30;
+    // Initial drain rate - much slower now
+    lightOffHealthDrainRate = 0.05; // Reduced from 0.1 to 0.05
+    addEventToLog('Lights have gone out! Fix them quickly!', 'warning');
+    updatePlantDisplay();
+}
+
+function fixLights() {
+    if (!lightIsOn) {
+        lightIsOn = true;
+        lightOffStartTime = null;
+        lightOffHealthDrainRate = 0;
+        addEventToLog('Lights are back on!', 'info');
+        updatePlantDisplay();
+    }
+}
+
+// Patch updatePlantDisplay to show light status and Fix Lights button
+const oldUpdatePlantDisplayWithLightStatus = updatePlantDisplay;
+updatePlantDisplay = function() {
+    oldUpdatePlantDisplayWithLightStatus.apply(this, arguments);
+    // Remove old overlay if it exists
+    let oldOverlay = document.getElementById('lightOverlay');
+    if (oldOverlay && oldOverlay.parentNode) {
+        oldOverlay.parentNode.removeChild(oldOverlay);
+    }
+    // Find the plant image section container
+    let plantImageSection = document.querySelector('.plant-image-section');
+    if (!plantImageSection) return;
+    // Ensure the container is position: relative
+    plantImageSection.style.position = 'relative';
+    // Create the overlay
+    let overlay = document.createElement('div');
+    overlay.id = 'lightOverlay';
+    overlay.style.position = 'absolute';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.cursor = 'pointer';
+    overlay.style.zIndex = '1000';
+    overlay.style.display = lightIsOn ? 'none' : 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.transition = 'opacity 0.3s ease';
+    overlay.onclick = fixLights;
+    overlay.innerHTML = '<div style="color: white; font-family: \'Press Start 2P\', monospace; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); font-size: 1.3em;">Lights Out!<br>Click to Fix</div>';
+    plantImageSection.appendChild(overlay);
+    // (rest of updatePlantDisplay unchanged)
+    // Update light bar based on light state
+    const lightLevel = document.getElementById('lightLevel');
+    if (lightLevel) {
+        lightLevel.style.transition = 'width 0.1s linear';
+        if (!lightIsOn) {
+            // When lights are off, gradually decrease the light bar
+            const timeOff = (Date.now() - lightOffStartTime) / 1000; // seconds
+            const lightValue = Math.max(0, 100 - (timeOff * 2)); // Decrease by 2% per second
+            lightLevel.style.width = lightValue + '%';
+            // Also update plant.light to match
+            plant.light = lightValue;
+        } else {
+            // When lights are on, show full light
+            lightLevel.style.width = '100%';
+            plant.light = 100;
+        }
+    }
+    // Update stress bar
+    const stressLevel = document.getElementById('stressLevel');
+    if (stressLevel) {
+        stressLevel.style.transition = 'width 0.1s linear';
+        stressLevel.style.width = plant.stress + '%';
+        // Animate color from grey to red as stress increases
+        function lerpColor(a, b, t) {
+            const ah = a.match(/\w\w/g).map(x => parseInt(x, 16));
+            const bh = b.match(/\w\w/g).map(x => parseInt(x, 16));
+            const rh = ah.map((v, i) => Math.round(v + (bh[i] - v) * t));
+            return `#${rh.map(x => x.toString(16).padStart(2, '0')).join('')}`;
+        }
+        const base = '23232b';
+        const red = 'ff1744';
+        const t = Math.max(0, Math.min(1, plant.stress / 100));
+        const color = lerpColor(base, red, t);
+        stressLevel.style.setProperty('--stress-color', color);
+    }
+};
+
+// ... existing code ...
+
+// Patch startGrowthTimer to handle light-off health drain
+const oldStartGrowthTimerWithLight = startGrowthTimer;
+startGrowthTimer = function() {
+    if (plant.growthTimer) {
+        clearInterval(plant.growthTimer);
+    }
+    feedingTick = 0;
+    plant.growthTimer = setInterval(function() {
+        // Drain water and nutrients each tick
+        if (plant.seedType && plant.soilType) {
+            const soil = soilTypes[plant.soilType];
+            const stageTicks = growthStages[plant.growthStage].time;
+            const waterDrain = soil.waterDrain;
+            const nutrientDrain = 0.5;
+            plant.water = Math.max(0, plant.water - waterDrain);
+            plant.nutrients = Math.max(0, plant.nutrients - nutrientDrain);
+        }
+        // Feeding logic (unchanged)
+        feedingTick++;
+        const stageKey = ['sprout', 'vegetative', 'flowering'][plant.growthStage] || 'flowering';
+        const schedule = plant.feedingSchedule[stageKey];
+        if (schedule && schedule.waterTimes > 0) {
+            const feedInterval = Math.max(1, Math.floor(growthStages[plant.growthStage].time / schedule.waterTimes));
+            if (feedingTick % feedInterval === 0) {
+                plant.water = Math.min(100, plant.water + 20);
+                let nuteAmount = 15;
+                if (schedule.nutrientMix && nutrientMixes[schedule.nutrientMix]) {
+                    nuteAmount = nutrientMixes[schedule.nutrientMix].nutrientFeed;
+                }
+                plant.nutrients = Math.min(100, plant.nutrients + nuteAmount);
+                if (schedule.nutrientMix && nutrientMixes[schedule.nutrientMix]) {
+                    if (!plant[stageKey + 'NutrientApplied']) {
+                        plant.potencyBoost *= nutrientMixes[schedule.nutrientMix].potency;
+                        plant.weight *= nutrientMixes[schedule.nutrientMix].yield;
+                        plant[stageKey + 'NutrientApplied'] = true;
+                    }
+                }
+            }
+        }
+        // --- LIGHT OFF HEALTH DRAIN ---
+        if (!lightIsOn) {
+            // Increase drain rate over time, but much more gradually
+            const timeOff = (Date.now() - lightOffStartTime) / 1000; // seconds
+            lightOffHealthDrainRate = Math.min(1.0, 0.1 + (timeOff / 300)); // Max 1.0x drain rate after 5 minutes
+            plant.health = Math.max(0, plant.health - lightOffHealthDrainRate);
+            // Increase stress more gradually when lights are off
+            plant.stress = Math.min(100, plant.stress + 0.5); // Reduced from 1 to 0.5
+            // Update light value based on time off
+            plant.light = Math.max(0, 100 - (timeOff * 2)); // Decrease by 2% per second
+        } else {
+            plant.light = 100;
+        }
+        // Check for random light failure
+        maybeTriggerLightFailure();
+        // Update plant health based on resources (unchanged)
+        updatePlantStatus();
+        plant.healthSum += plant.health;
+        plant.healthTicks++;
+        // Remove light efficiency calculations since we're not using optimal light anymore
+        plant.lightEfficiencySum = 100;
+        plant.lightEfficiencyTicks = 1;
+        maybeTriggerEvent();
+        if (plant.stageTime >= growthStages[plant.growthStage].time) {
+            plant[stageKey + 'NutrientApplied'] = false;
+            feedingTick = 0;
+            advanceGrowthStage();
+        }
+        plant.stageTime++;
+        updatePlantDisplay();
+    }, growthTimerInterval);
+    console.log('GROWTH TIMER STARTED, interval:', growthTimerInterval);
+};
+
+// ... existing code ...
+
+// --- Light Unlock Thresholds ---
+const lightUnlockThresholds = [
+    { key: 'desk', threshold: 50 },
+    { key: 'grow', threshold: 100 },
+    { key: 'led', threshold: 150 },
+    { key: 'quantum', threshold: 200 }
+];
+
+function checkAndUnlockLights() {
+    const totalYield = highScores.totalYield[currentGrower] || 0;
+    let unlockedAny = false;
+    lightUnlockThresholds.forEach(({ key, threshold }) => {
+        if (!ownedLights[key] && totalYield >= threshold) {
+            ownedLights[key] = true;
+            addEventToLog(`Unlocked ${lightSources[key].name} for reaching ${threshold}g total yield!`, 'info');
+            unlockedAny = true;
+        }
+    });
+    // If any new light was unlocked, select the highest unlocked light
+    if (unlockedAny) {
+        // Get all unlocked lights in order of threshold
+        let unlockedKeys = lightUnlockThresholds.filter(({ key }) => ownedLights[key]).map(({ key }) => key);
+        if (unlockedKeys.length > 0) {
+            currentLight = unlockedKeys[unlockedKeys.length - 1];
+            renderLightSourceUI();
+        }
+    }
+}
+
+// Patch updatePlantDisplay to check for light unlocks
+const oldUpdatePlantDisplayWithUnlock = updatePlantDisplay;
+updatePlantDisplay = function() {
+    oldUpdatePlantDisplayWithUnlock.apply(this, arguments);
+    checkAndUnlockLights();
+};
+
+const oldInitializeGameWithUnlock = initializeGame;
+initializeGame = function() {
+    oldInitializeGameWithUnlock.apply(this, arguments);
+    checkAndUnlockLights();
+};

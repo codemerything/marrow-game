@@ -19,8 +19,8 @@
             <div class="name-input-bg">
                 <img src="img/selections/introimage.png" alt="Intro" class="intro-bg-img" />
                 <div class="name-input-content">
-                    <h2 id="growerNamePrompt">Enter your Grower name</h2>
-                    <input id="growerNameInput" type="text" maxlength="16" autocomplete="off" placeholder="Grower name..." />
+                    <h2>Enter Your Grower Name</h2>
+                    <input type="text" id="growerNameInput" maxlength="20" placeholder="Enter name...">
                     <button id="confirmNameBtn">Begin Growing</button>
                 </div>
             </div>
@@ -196,9 +196,6 @@
             <div id="seedBankSelectionDisplay" class="score-entry" style="font-size:1.1em;color:#ffd700;text-align:center;margin-top:10px;">Seeds: <span style='color:#fff;'>0</span></div>
         </div>
     </div>
-    <div id="mobileMessage">
-        Not available for mobile screens, switch to desktop
-    </div>
 
     <div id="harvestWindow" class="harvest-window hidden">
         <div class="harvest-content">
@@ -234,6 +231,31 @@
             <div id="lookForSeedsMsg" style="text-align:center;margin:10px 0;color:#ffd700;font-family:'Press Start 2P',monospace;"></div>
             <button id="lookForSeedsBtn" class="look-for-seeds-button" style="margin-bottom:12px;">Look for Seeds</button>
             <button id="newGameBtn" class="new-game-button" disabled>Start New Game</button>
+            <button id="breedStrainBtn" class="breed-strain-button" style="margin-bottom:12px;display:none;">Breed New Strain</button>
+        </div>
+    </div>
+
+    <div id="breedModal" class="breed-modal hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(35,20,28,0.95);z-index:4000;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="background:#23232b;border-radius:18px;padding:32px 40px;box-shadow:0 6px 32px #000a,0 0 0 2px #18141a;display:flex;flex-direction:column;align-items:center;">
+            <h2 style="color:#ffd700;font-family:'Press Start 2P',monospace;font-size:2em;margin-bottom:18px;">Breed New Strain</h2>
+            <img src="img/selections/seed7.png" alt="New Strain" style="width:80px;height:80px;margin-bottom:18px;" />
+            <input id="newStrainNameInput" type="text" maxlength="18" placeholder="Enter strain name..." style="font-size:1.2em;padding:8px 16px;border-radius:8px;border:none;margin-bottom:16px;width:220px;text-align:center;" />
+            <button id="confirmBreedBtn" style="font-size:1.1em;padding:10px 32px;background:#bfcfff;color:#23141c;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;cursor:pointer;margin-bottom:8px;">Create Strain</button>
+            <button id="cancelBreedBtn" style="font-size:1em;padding:6px 18px;background:#444;color:#fff;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;cursor:pointer;">Cancel</button>
+            <div id="breedMsg" style="color:#ffd700;font-family:'Press Start 2P',monospace;font-size:1em;margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div id="slotsModal" class="slots-modal hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(35,20,28,0.95);z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="background:#23232b;border-radius:18px;padding:32px 40px;box-shadow:0 6px 32px #000a,0 0 0 2px #18141a;display:flex;flex-direction:column;align-items:center;">
+            <h2 style="color:#ffd700;font-family:'Press Start 2P',monospace;font-size:2em;margin-bottom:18px;">Daily Seed Slots</h2>
+            <div id="slotsReels" style="display:flex;gap:24px;font-size:3em;margin-bottom:18px;">
+                <span id="slot1">🌱</span>
+                <span id="slot2">💀</span>
+                <span id="slot3">⭐</span>
+            </div>
+            <button id="spinSlotsBtn" style="font-size:1.2em;padding:12px 36px;background:#bfcfff;color:#23141c;border:none;border-radius:8px;font-family:'Press Start 2P',monospace;cursor:pointer;margin-bottom:12px;">Spin</button>
+            <div id="slotsResultMsg" style="color:#ffd700;font-family:'Press Start 2P',monospace;font-size:1.1em;margin-top:8px;"></div>
         </div>
     </div>
 
